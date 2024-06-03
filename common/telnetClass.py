@@ -10,7 +10,7 @@ import common.get_user_info
 import threading
 from rich import print
 
-writeapitofile=True
+writeapitofile=False
 
 
 class realmsClient:
