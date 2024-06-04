@@ -3,27 +3,48 @@ import telnetlib
 import json
 import re
 
-import rich
 from colorama import Fore
 from time import sleep as wait
 import common.get_user_info
-import threading
-from rich import print
+import storage.art
 
 writeapitofile=False
 
+def turnFull(cmd:str):
+    if cmd=="n":
+        print(Fore.MAGENTA+storage.art.movedn)
+        return "north"
+    elif cmd=="s":
+        print(Fore.MAGENTA + storage.art.moveds)
+        return "south"
+    elif cmd=="e":
+        print(Fore.MAGENTA + storage.art.movede)
+        return "east"
+    elif cmd=="w":
+        print(Fore.MAGENTA + storage.art.movedw)
+        return "west"
 
 class realmsClient:
     def __init__(self,password:str,usrname:str):
+        """
+        init fucn
+        :param password:
+        :param usrname:
+        """
         self.telnetClient=telnetlib.Telnet()
         self.password=password
         self.username=usrname
         self.current_room=""
 
     def connect(self):
+        """
+        connect to realms93
+        :return:
+        """
         self.telnetClient.open(host="windows93.net", port=8082)
         self.telnetClient.write(str.encode(self.username+"\n"))
         self.telnetClient.write(str.encode(self.password+"\n"))
+        print(bytes.decode(self.telnetClient.read_very_eager()))
 
         return self.telnetClient
 
@@ -31,6 +52,10 @@ class realmsClient:
 
 
     def get_api_dict(self) -> dict:
+        """
+        get the api dictionary provided by Realms93.
+        :return:
+        """
         while 1:
             self.telnetClient.write(str.encode("api\n"))
             wait(0.01)
@@ -42,6 +67,10 @@ class realmsClient:
             if eagerlook[0]=="[" and eagerlook[-1]!="]":
                 ascii_ver+="]"
             if eagerlook[0]=="[" or eagerlook[0]=="{":
+                try:
+                    dictver=eval(eagerlook.strip())
+                except SyntaxError:
+                    continue
                 dictver=eval(eagerlook.strip())
                 if dictver==[]:
                     continue
@@ -49,7 +78,6 @@ class realmsClient:
                 if writeapitofile:
                     with open(file="storage/apistore.json", mode="w", newline=None) as apifile:
                         json.dump(dictver,apifile,indent=3)
-
                 if type(dictver)==list:
                     if len(dictver)==0:
                         continue
@@ -59,7 +87,24 @@ class realmsClient:
             else:
                 continue
 
+    def run_alias(self,aliascmd):
+        """
+        run an alias set in accountdata.json
+        :param aliascmd:
+        :return:
+        """
+        accinfo=common.get_user_info.getUserCond()
+        if len(accinfo["aliases"])!=0:
+            for cmd in accinfo["aliases"]:
+                split=str.split(cmd,"|")
+                if split[0]==aliascmd:
+                    self.send_message(split[1])
+
     def take_all_money(self):
+        """
+        take all money from ground
+        :return:
+        """
         api=self.get_api_dict()
         room_money=api["room"]["money"]
         if room_money!=0:
@@ -68,29 +113,47 @@ class realmsClient:
             return room_money
 
     def send_message(self,inputx:str):
+        """
+        send a command to telnet
+        :param inputx:
+        :return:
+        """
+        if inputx=="quit":
+            self.telnetClient.close()
+            print(Fore.RED + "Connection Closed to windows93.net:8082")
+            exit(0)
+
         if inputx=="l" or inputx=="look":
             self.print_look()
-
-        if inputx=="look":
-            self.telnetClient.write(str.encode("list\n"))
-            print(bytes.decode(self.telnetClient.read_very_eager()))
-
         if inputx=="n" or inputx=="w" or inputx=="e" or inputx=="s":
+            print("windows")
             api_req=self.get_api_dict()
-            if inputx in api_req["room"]["exits"]:
-                self.telnetClient.write(str.encode(inputx+"\n"))
-                return True
+            print(inputx in api_req["room"]["exits"])
+            if inputx not in api_req["room"]["exits"]:
+                print(inputx)
+                print(Fore.MAGENTA + "You cannot bump into walls.")
+                return
+            else:
+                print(turnFull(inputx) + "\n")
+                self.telnetClient.write(str.encode(turnFull(inputx) + "\n"))
+
+        if inputx=="list":
+            readx=bytes.decode(self.telnetClient.read_until(str.encode("--------------------------------------------------------------------------------")))
+            print(readx)
 
         if "fuck" in inputx:
             wants_hell=input(Fore.RED+"Are you sure you want to go to hell? (saying fuck will teleport you to hell)? \n (Y/N) > ")
             if wants_hell=="Y":
-                self.telnetClient.write(str.encode(inputx))
+                self.telnetClient.write(str.encode(inputx+"\n"))
         else:
-            self.telnetClient.write(str.encode(inputx))
+            self.telnetClient.write(str.encode(inputx+"\n"))
 
         return inputx
 
     def auto_attack(self):
+        """
+        attack
+        """
         api_req=self.get_api_dict()
         weapon_attack_speed=common.get_user_info.getUserCond()["attack_speed"]
 
@@ -99,21 +162,17 @@ class realmsClient:
             wait(weapon_attack_speed)
 
 
-    def print_latest(self) -> str:
+    def print_latest(self):
+        """
+        print latest
+        :return:
+        """
         # print(bytes.decode(self.telnetClient.read_very_eager()))
         print(bytes.decode(self.telnetClient.read_very_eager()))
-        return bytes.decode(self.telnetClient.read_very_eager())
 
 
-    # def get_user_stat_format(self) -> str:
-    #     apireq=self.get_api_dict()
-    #     return f"""
-    #     --------------stats--------------
-    #     hp: {apireq['']}
-    #     """
 
-
-    def print_look(self) -> str:
+    def print_look(self):
         """
         getting a look at the place the player currently recides
         :return:
@@ -124,6 +183,7 @@ class realmsClient:
         humanlist=""
         itemlist=""
         apireq=self.get_api_dict()
+        print(apireq["room"]["name"])
 
         if "n" in apireq["room"]["exits"]:
             exitNodes+="NORTH "
@@ -138,13 +198,13 @@ class realmsClient:
            enemylist+=i
 
         for i in apireq["room"]["players"]:
-            humanlist+=i
+            humanlist+=i+" "
         for i in apireq["room"]["items"]:
-            itemlist+=i
+            itemlist+=i+" "
 
         exitNodes.strip()
         print(Fore.WHITE+apireq['room']['name'])
-        print(Fore.MAGENTA+apireq['room']['description'])
+        print(Fore.MAGENTA+str.replace(apireq['room']['description'],"<","[").replace(">","]"))
         print(Fore.YELLOW+"exits:"+exitNodes)
         if itemlist!="":
             print(Fore.LIGHTYELLOW_EX+f"You see: {itemlist}")
@@ -163,4 +223,9 @@ class Extras:
 
     @staticmethod
     def next_level_exp(lv:int):
+        """
+        get the amount of xp required for specified level
+        :param lv:
+        :return:
+        """
         return round(100 * (pow(1.4, lv) - 1))
