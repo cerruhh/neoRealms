@@ -144,17 +144,12 @@ class realmsClient:
 
         if inputx=="n" or inputx=="w" or inputx=="e" or inputx=="s":
             if inputx not in vapi["room"]["exits"]:
-                print(inputx)
                 print(Fore.MAGENTA + "You cannot bump into walls.")
                 return 0
             else:
-                print("runx")
                 self.telnetClient.write(str.encode(turnFull(cmd=inputx) + "\n"))
+                self.print_look()
                 return 0
-
-        if inputx == "list":
-            readx = bytes.decode(self.telnetClient.read_until())
-#           str.encode("--------------------------------------------------------------------------------")))
 
         if "fuck" in inputx:
             wants_hell = input(Fore.RED + "Are you sure you want to go to hell? (saying fuck will teleport you to hell)? \n (Y/N) > ")
@@ -174,12 +169,14 @@ class realmsClient:
         attack
         """
         api_req = None
-        if api is not None:
+        if None != api:
             api_req = api
         else:
             api_req = self.get_api_dict()
+
+        print(api_req)
         weapon_attack_speed = common.get_user_info.getUserCond()["attack_speed"]
-        if len(api["room"]["enemies"]) != 0:
+        if len(api_req["room"]["enemies"]) != 0:
             while True:
                 self.telnetClient.write(str.encode("a\n"))
                 wait(weapon_attack_speed)

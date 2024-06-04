@@ -10,7 +10,16 @@ port=userinfo["port"]
 
 
 
+def print_filter(eread:str):
+    splitlines=eread.splitlines()
+    for i in splitlines:
+        if i=="":
+            continue
 
+        if i[0]=="{" or i[0]=="[" or i[-1]=="}" or i[-1]=="]":
+            i=""
+
+    return str(splitlines)
 
 def login_user():
     """
@@ -46,6 +55,10 @@ def main():
         # autoattack_class.join()
         wait(0.2)
         lastcommand=""
+
+        atk_process=Process(target=client.auto_attack(None))
+        atk_process.start()
+        atk_process.join()
         while True:
             wait(0.2)
             user_command=input(" > ")
@@ -58,9 +71,12 @@ def main():
 
             if user_command[0]!="!":
                 apiSend=client.get_api_dict()
-                client.send_message(user_command,api=apiSend)
                 client.take_all_money(apiparam=apiSend)
+                wait(0.126)
+                client.send_message(user_command,api=apiSend)
+                wait(0.126)
                 client.auto_attack(api=apiSend)
+                print_filter(bytes.decode(client.telnetClient.read_very_eager()))
             elif user_command[0]=="!":
                 cmdx=user_command.split("!")[1]
                 client.run_alias(cmdx)
@@ -71,3 +87,7 @@ def main():
 
 if __name__=="__main__":
     main()
+    # for i in range(0,10,1):
+    #     nproccess=Process(target=main,args=())
+    #     nproccess.start()
+    #     nproccess.join()
