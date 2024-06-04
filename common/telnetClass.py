@@ -165,9 +165,11 @@ class realmsClient:
             return inputx
 
     def auto_attack(self, api: dict = None):
+
         """
         attack
         """
+        print("atx")
         api_req = None
         if None != api:
             api_req = api
@@ -179,6 +181,7 @@ class realmsClient:
         if len(api_req["room"]["enemies"]) != 0:
             while True:
                 self.telnetClient.write(str.encode("a\n"))
+                print("asyncx")
                 wait(weapon_attack_speed)
 
     def print_latest(self):

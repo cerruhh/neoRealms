@@ -4,6 +4,7 @@ from time import sleep as wait
 from colorama import Fore
 import storage.art
 from multiprocessing import Process
+import re
 userinfo=common.get_user_info.getUserCond()
 host=userinfo["host"]
 port=userinfo["port"]
@@ -11,15 +12,8 @@ port=userinfo["port"]
 
 
 def print_filter(eread:str):
-    splitlines=eread.splitlines()
-    for i in splitlines:
-        if i=="":
-            continue
-
-        if i[0]=="{" or i[0]=="[" or i[-1]=="}" or i[-1]=="]":
-            i=""
-
-    return str(splitlines)
+    newre2=''.join(eread.splitlines(keepends=True)[1:])
+    return newre2
 
 def login_user():
     """
@@ -75,8 +69,8 @@ def main():
                 wait(0.126)
                 client.send_message(user_command,api=apiSend)
                 wait(0.126)
-                client.auto_attack(api=apiSend)
-                print_filter(bytes.decode(client.telnetClient.read_very_eager()))
+                print(print_filter(bytes.decode(client.telnetClient.read_very_eager())))
+
             elif user_command[0]=="!":
                 cmdx=user_command.split("!")[1]
                 client.run_alias(cmdx)
