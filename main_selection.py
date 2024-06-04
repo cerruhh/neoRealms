@@ -4,8 +4,9 @@ from time import sleep as wait
 from colorama import Fore
 import storage.art
 from multiprocessing import Process
-host="windows93.net"
-port=8082
+userinfo=common.get_user_info.getUserCond()
+host=userinfo["host"]
+port=userinfo["port"]
 
 
 
@@ -16,10 +17,14 @@ def login_user():
     create a client to use to interact with Realms93
     :return:
     """
-    userinfo=common.get_user_info.getUserCond()
-    newRealClient=realmsClient(password=userinfo["password"],usrname=userinfo["username"])
-    return newRealClient
-
+    if userinfo["debug_level"]!=0:
+        debuglevel=userinfo["debug_level"]
+        newRealClient=realmsClient(password=userinfo["password"],usrname=userinfo["username"],dbglv=debuglevel)
+        return newRealClient
+    else:
+        debuglevel = userinfo["debug_level"]
+        newRealClient = realmsClient(password=userinfo["password"], usrname=userinfo["username"], dbglv=debuglevel)
+        return newRealClient
 
 
 def main():
@@ -29,7 +34,7 @@ def main():
     """
     print(Fore.YELLOW+storage.art.welcomeart)
     while True:
-        userAsk = input("what do you want to do? (gui,cli,abort)?\n > ").lower()
+        userAsk = input(Fore.RESET+"what do you want to do? (gui,cli,abort)?\n > ").lower()
         if userAsk=="gui" or userAsk=="g" or userAsk=="c" or userAsk=="cli" or userAsk=="a" or userAsk=="abort":
             break
 
@@ -52,18 +57,14 @@ def main():
             lastcommand=user_command
 
             if user_command[0]!="!":
-                line = client.telnetClient.read_until(str.encode("\n"),timeout=1)
-                print(bytes.decode(line).replace("93 Realms", "neoRealms"))
-                client.send_message(user_command)
-                client.take_all_money()
-                client.auto_attack()
-                print(bytes.decode(client.telnetClient.read_very_eager()).replace("93 Realms","neoRealms"))
+                apiSend=client.get_api_dict()
+                client.send_message(user_command,api=apiSend)
+                client.take_all_money(apiparam=apiSend)
+                client.auto_attack(api=apiSend)
             elif user_command[0]=="!":
-                line = client.telnetClient.read_until(b"\n\r",timeout=1)
-                print(bytes.decode(line))
                 cmdx=user_command.split("!")[1]
                 client.run_alias(cmdx)
-                print(bytes.decode(client.telnetClient.read_some()))
+
     elif userAsk=="abort":
         exit(0)
 
