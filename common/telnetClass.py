@@ -13,16 +13,16 @@ writeapitofile = False
 
 def turnFull(cmd: str):
     if cmd == "n":
-        print(Fore.MAGENTA + storage.art.movedn)
+        #print(Fore.MAGENTA + storage.art.movedn)
         return "north"
     elif cmd == "s":
-        print(Fore.MAGENTA + storage.art.moveds)
+        #print(Fore.MAGENTA + storage.art.moveds)
         return "south"
     elif cmd == "e":
-        print(Fore.MAGENTA + storage.art.movede)
+        #print(Fore.MAGENTA + storage.art.movede)
         return "east"
     elif cmd == "w":
-        print(Fore.MAGENTA + storage.art.movedw)
+        #print(Fore.MAGENTA + storage.art.movedw)
         return "west"
 
 
@@ -120,9 +120,10 @@ class realmsClient:
             newapi = self.get_api_dict()
             return room_money
 
-    def send_message(self, inputx: str, api: dict=None):
+    def send_message(self, inputx: str, isrecall:bool=False, api:dict=None):
         """
         send a command to telnet
+        :param api:
         :param inputx:
         :return:
         """
@@ -139,49 +140,46 @@ class realmsClient:
 
         if inputx == "l" or inputx == "look":
             self.print_look()
-            return 0
+            return False
 
 
         if inputx=="n" or inputx=="w" or inputx=="e" or inputx=="s":
             if inputx not in vapi["room"]["exits"]:
                 print(Fore.MAGENTA + "You cannot bump into walls.")
-                return 0
+                return False
             else:
                 self.telnetClient.write(str.encode(turnFull(cmd=inputx) + "\n"))
                 self.print_look()
-                return 0
+                return True
 
         if "fuck" in inputx:
             wants_hell = input(Fore.RED + "Are you sure you want to go to hell? (saying fuck will teleport you to hell)? \n (Y/N) > ")
             if wants_hell == "Y":
                 self.telnetClient.write(str.encode(inputx + "\n"))
-                return
+                return False
             else:
                 self.telnetClient.write(str.encode(inputx.replace("fuck","funk")+"\n"))
-                return
+                return False
         else:
             self.telnetClient.write(str.encode(inputx + "\n"))
 
-            return inputx
+            return False
 
     def auto_attack(self, api: dict = None):
 
         """
         attack
         """
-        print("atx")
         api_req = None
         if None != api:
             api_req = api
         else:
             api_req = self.get_api_dict()
 
-        print(api_req)
         weapon_attack_speed = common.get_user_info.getUserCond()["attack_speed"]
         if len(api_req["room"]["enemies"]) != 0:
             while True:
                 self.telnetClient.write(str.encode("a\n"))
-                print("asyncx")
                 wait(weapon_attack_speed)
 
     def print_latest(self):
@@ -203,7 +201,6 @@ class realmsClient:
         humanlist = ""
         itemlist = ""
         apireq = self.get_api_dict()
-        print(apireq["room"]["name"])
 
         if "n" in apireq["room"]["exits"]:
             exitNodes += "NORTH "
@@ -233,6 +230,29 @@ class realmsClient:
         if enemylist != "":
             print(Fore.RED + f"Enemies: {enemylist}")
 
+    def infiniatk(self):
+        """
+        infintly attacks
+        :param client:
+        :return:
+        """
+        extrax = Extras
+        isLast = 0
+        while True:
+            pass
+            # api = client.get_api_dict()
+            # curlv=api["level"]
+            # xpNeeded=extrax.next_level_exp(lv=curlv) - api["experience"]
+            # client.send_message("a", api=api)
+            # latest=client.print_latest()
+            # eager=Fore.RED+bytes.decode(client.telnetClient.read_very_eager())
+            # if eager!="\n":
+            #     print(Fore.RED+bytes.decode(client.telnetClient.read_very_eager()))
+            # if isLast!=xpNeeded:
+            #     print(Fore.LIGHTRED_EX+f"You need {xpNeeded} to get to the next level!")
+            #     isLast=xpNeeded
+            # wait(0.2)
+
 
 class Extras:
     def __init__(self):
@@ -246,3 +266,9 @@ class Extras:
         :return:
         """
         return round(100 * (pow(1.4, lv) - 1))
+
+
+    def get_all_accs(self):
+        userCond=common.get_user_info.getUserCond()
+        return userCond["accounts"]
+
