@@ -37,8 +37,15 @@ in common/accountdata.json you can find the configuration, here is a example fol
     "password": "userpassword",
     "username": "username",
     "attack_speed": 1,
-    "host":"https://windows93.net"
-    "port":8082
+    "host":"https://www.windows93.net",
+    "port":8082,
+    "debug_level": 0,
+    "accounts": [
+      {
+          "username": "us",
+          "password": "pwd"  
+      }
+    ],
     "aliases": [
       "run townsquare-christiana|run 3n2e4n2e1n1e3n1e4n1w3n1w2n1w1n1w1n2w1n2w1n1w",
       "run christiana-townsqaure|run 1e1s2e1s2e1s1e1s1e2s1e3s1e4s1w3s1w1s2w4s2w3s",
@@ -47,7 +54,8 @@ in common/accountdata.json you can find the configuration, here is a example fol
       "n|north",
       "w|west",
       "e|east",
-      "iha|hello everyone! i will let you know that i have no life whatsoever!"
+      "iha|hello everyone! i will let you know that i have no life whatsoever!",
+      "wxx|l\n w\n"
     ]
   }
 }
@@ -55,3 +63,16 @@ in common/accountdata.json you can find the configuration, here is a example fol
 ```
 
 most configurations should be obvoius. In case of the aliases do: "the alias|the command", use the | sign to seperate the alias and command. you can use aliases by running !alias_name. Setting "host" and "port" to empty will default to windows93.net and 8082.
+
+
+## Improvements & QoL changes
+Here is what neoRealms does differently than https://windows93.net:8083.
+
+
+- not entering movements if bumping into walls
+- automatically taking money from ground.
+- aliases to macro commands
+- automatically attack enemies 24/7
+- gui version of realms93
+- (coming soon) controlled swarm of synchronized users.
+- alternate account manager
