@@ -61,7 +61,7 @@ class realmsClient:
         while 1:
             self.telnetClient.write(str.encode("api\n"))
             wait(0.01)
-            eagerlook = bytes.decode(self.telnetClient.read_very_eager())
+            eagerlook = bytes.decode(self.telnetClient.read_very_eager(),encoding="latin-1")
             last_line_eager = str.split(eagerlook, "\n")[-1].strip().replace("\n", "")
             ascii_ver = ''.join(filter(lambda x: x in string.printable, last_line_eager)).replace("0m", "")
             if eagerlook == "":

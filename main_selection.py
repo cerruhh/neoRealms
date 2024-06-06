@@ -4,6 +4,8 @@ from time import sleep as wait
 from colorama import Fore
 import storage.art
 from multiprocessing import Process
+from threading import Thread
+import concurrent.futures
 
 import re
 userinfo=common.get_user_info.getUserCond()
@@ -12,14 +14,33 @@ port=userinfo["port"]
 
 
 
-
-
 def print_filter(eread:str):
-    # if eread=="":
-    #     return ""
-    print(eread)
-    newre2=''.join(eread.splitlines(keepends=True)[1:])
-    return newre2
+    # Define the regex pattern to exclude lines starting with [ or { and ending with ] or }
+    pattern = r"^(?![{\[]).*?(?<![}\]])$"
+
+    # Find all matching lines
+    matching_lines = re.findall(pattern, eread, flags=re.MULTILINE)
+
+    # Join the matching lines into a single string
+    filtered_text = "\n".join(matching_lines)
+
+    return filtered_text
+    # .join(eread.split("\n")[1:])
+
+
+
+def proc_read(cl):
+    wait(1)
+    oread=print_filter(bytes.decode(cl.telnetClient.read_very_eager(),encoding="latin-1"))
+    while True:
+        newread=print_filter(bytes.decode(cl.telnetClient.read_very_eager()))
+        if newread!=oread and (newread!="" or newread!="\n"):
+            print(newread.strip())
+            oread=newread
+#           wait(0)
+
+
+
 
 def login_user():
     """
@@ -53,10 +74,13 @@ def main():
         wait(0.2)
         lastcommand=""
 
-        atk_process=Process(target=client.auto_attack(None))
+        atk_process=Thread(target=client.auto_attack)
         atk_process.start()
-        atk_process.join()
         client.print_look()
+
+        lookproc=Thread(target=proc_read,args=[client])
+        lookproc.start()
+
 #       print(repr(client.telnetClient.read_all()))
         while True:
             wait(0.2)
@@ -71,23 +95,15 @@ def main():
 
                 if user_command[0]!="!":
                     apiSend=client.get_api_dict()
-                    client.take_all_money(apiparam=apiSend)
-                    wait(0.126)
-                    is_movement=client.send_message(user_command,api=apiSend,isrecall=False)
-                    wait(0.2)
-                    if not is_movement:
-                        print(print_filter(bytes.decode(client.telnetClient.read_very_eager())))
-                    else:
-                        client.print_look()
-
+                    if apiSend!=None:
+                        client.take_all_money(apiparam=apiSend)
+                        wait(0.126)
+                        client.send_message(user_command,api=apiSend,isrecall=False)
                 elif user_command[0]=="!":
                     cmdx=user_command.split("!")[1]
                     if cmdx=="aaf":
                         infiProcess=Process(target=client.infiniatk())
                         infiProcess.start()
-                        infiProcess.join()
-
-                        print("joined")
                         continue
                     else:
                         client.run_alias(cmdx)
