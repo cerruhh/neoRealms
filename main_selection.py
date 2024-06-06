@@ -28,6 +28,15 @@ def print_filter(eread:str):
     # .join(eread.split("\n")[1:])
 
 
+def print_status(status:str):
+    print("\u001B[s", end="")  # Save current cursor position
+    print("\u001B[A", end="")  # Move cursor up one line
+    print("\u001B[999D", end="")  # Move cursor to beginning of line
+    print("\u001B[S", end="")  # Scroll up/pan window down 1 line
+    print("\u001B[L", end="")  # Insert new line
+    print(status, end="")  # Print output status msg
+    print("\u001B[u", end="")  # Jump back to saved cursor position
+
 
 def proc_read(cl):
     wait(1)
@@ -35,9 +44,11 @@ def proc_read(cl):
     while True:
         newread=print_filter(bytes.decode(cl.telnetClient.read_very_eager()))
         if newread!=oread and (newread!="" or newread!="\n"):
-            print(newread.strip())
+            print_status(newread.strip())
             oread=newread
-#           wait(0)
+        wait(0.5)
+
+
 
 
 
@@ -65,7 +76,7 @@ def main():
     print(Fore.YELLOW+storage.art.welcomeart)
     while True:
         userAsk = input(Fore.RESET+"what do you want to do? (gui,cli,abort)?\n > ").lower()
-        if userAsk=="gui" or userAsk=="g" or userAsk=="c" or userAsk=="cli" or userAsk=="a" or userAsk=="abort":
+        if userAsk=="gui" or userAsk=="g" or userAsk=="c" or userAsk=="cli" or userAsk=="a" or userAsk=="abort" or userAsk=="about":
             break
 
     if userAsk=="cli" or userAsk=="c":
@@ -107,6 +118,15 @@ def main():
                         continue
                     else:
                         client.run_alias(cmdx)
+    elif userAsk=="about":
+        print(Fore.YELLOW+storage.art.welcomeart)
+        print("""
+        Welcome to neorealms,
+        a custom realms client created by cerruhh designed to make the realms93 experience better.
+        
+        2024-3000
+        """)
+        exit(2015)
 
     elif userAsk=="abort":
         exit(0)
@@ -114,7 +134,3 @@ def main():
 
 if __name__=="__main__":
     main()
-    # for i in range(0,10,1):
-    #     nproccess=Process(target=main,args=())
-    #     nproccess.start()
-    #     nproccess.join()
