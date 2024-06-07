@@ -95,10 +95,11 @@ def main():
 #       print(repr(client.telnetClient.read_all()))
         while True:
             wait(0.2)
-            user_command=input(" > ")
+            user_command=input("\n")
             if user_command=="":
                 if lastcommand!="":
                     ism=client.send_message(lastcommand.strip())
+                    wait(.2)
                 else:
                     continue
             else:
@@ -106,7 +107,7 @@ def main():
 
                 if user_command[0]!="!":
                     apiSend=client.get_api_dict()
-                    if apiSend!=None:
+                    if apiSend is not None:
                         client.take_all_money(apiparam=apiSend)
                         wait(0.126)
                         client.send_message(user_command,api=apiSend,isrecall=False)
