@@ -25,9 +25,10 @@ python3 main_selection.py
 
 Windows: Find Python on the internet and install it, then download NeoRealms. Run main_selection.py
 ```bat
-winget install git python
-
-
+winget install git python3
+git clone https://github.com/cerruhh/neoRealms.git
+cd neoRealms
+python3 main_selection.py
 ```
 
 
