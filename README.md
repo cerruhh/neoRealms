@@ -30,6 +30,7 @@ git clone https://github.com/cerruhh/neoRealms.git
 cd neoRealms
 python3 main_selection.py
 ```
+Do not run setup.py! setup.py will not setup nr93
 
 
 ## Configuration

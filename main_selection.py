@@ -1,3 +1,7 @@
+import setup
+if setup.needs_setup() == False:
+    setup.setup()
+    exit(0)
 import common.get_user_info
 from common.telnetClass import realmsClient
 from time import sleep as wait
@@ -9,6 +13,7 @@ import common.shop_lists
 import os
 
 import re
+
 
 userinfo = common.get_user_info.getUserCond()
 host = userinfo["host"]
