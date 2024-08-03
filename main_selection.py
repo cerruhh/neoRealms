@@ -65,7 +65,7 @@ def remove_api(stringx: str):
 
 def proc_read(cl):
     wait(1)
-    oread = remove_api(print_filter(bytes.decode(cl.telnetClient.read_very_eager(), encoding="latin-1")))
+    oread = remove_api(print_filter(bytes.decode(cl.telnetClient.read_very_eager(), encoding="utf-8")))
     while True:
         if cl.exited:
             exit(0)
@@ -79,18 +79,14 @@ def proc_read(cl):
 
 def login_user(username: str = userinfo["username"], password: str = userinfo["password"]):
     """
-    create a client to use to interact with Realms93
+    creates a login_user realmsclient
+    :param username:
+    :param password:
     :return:
     """
-    if userinfo["debug_level"] != 0:
-        debuglevel = userinfo["debug_level"]
-        newRealClient = realmsClient(password=password, usrname=username, dbglv=debuglevel)
-        return newRealClient
-    else:
-        debuglevel = userinfo["debug_level"]
-        newRealClient = realmsClient(password=password, usrname=password, dbglv=debuglevel)
-        return newRealClient
-
+    debuglevel = userinfo["debug_level"]
+    newRealClient = realmsClient(password=password, usrname=username, dbglv=debuglevel)
+    return newRealClient
 
 def main():
     """
@@ -123,11 +119,12 @@ def main():
 
 
             while True:
-                user_selected = input(Fore.YELLOW + "Please Select User by username\n > ")
+                user_selected = input(Fore.YELLOW + "Please Select User by username, or if you want the default account, type 'default'\n > ")
                 is_found = False
 
                 if user_selected == "default":
                     client=login_user()
+                    is_found = True
                     break
                 for i in userinfo["accounts"]:
                     if str(i["username"]) == user_selected:

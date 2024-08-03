@@ -52,7 +52,10 @@ class realmsClient:
         :return:
         """
         self.telnetClient.open(host="windows93.net", port=8082)
+        self.telnetClient.read_until(b'Please enter your name, or "new" if you are new.')
+
         self.telnetClient.write(str.encode(self.username + "\n"))
+        wait(0.1)
         self.telnetClient.write(str.encode(self.password + "\n"))
         print(bytes.decode(self.telnetClient.read_very_eager()))
 
@@ -65,8 +68,9 @@ class realmsClient:
         """
         while 1:
             self.telnetClient.write(str.encode("api\n"))
-            wait(0.01)
-            eagerlook = bytes.decode(self.telnetClient.read_very_eager(), encoding="latin-1")
+            wait(0.05)
+            eagerlook = bytes.decode(self.telnetClient.read_very_eager(),encoding="utf-8")
+            # , encoding="utf-8"
             last_line_eager = str.split(eagerlook, "\n")[-1].strip().replace("\n", "")
             ascii_ver = ''.join(filter(lambda x: x in string.printable, last_line_eager)).replace("0m", "")
             if eagerlook == "":

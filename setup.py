@@ -9,6 +9,8 @@ template_settings = {
         "host": "",
         "port": 8082,
         "debug_level": 0,
+        "debug_fix": 1,
+        "welcome_art": 1,
         "accounts": [
             {
                 "username": "extra_account",
