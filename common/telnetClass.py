@@ -2,6 +2,8 @@ import string
 import telnetlib
 import json
 import re
+# import curses
+#from curses import wrapper
 
 from colorama import Fore
 from time import sleep as wait
@@ -69,7 +71,7 @@ class realmsClient:
         while 1:
             self.telnetClient.write(str.encode("api\n"))
             wait(0.05)
-            eagerlook = bytes.decode(self.telnetClient.read_very_eager(),encoding="utf-8")
+            eagerlook = bytes.decode(self.telnetClient.read_very_eager(), encoding="utf-8")
             # , encoding="utf-8"
             last_line_eager = str.split(eagerlook, "\n")[-1].strip().replace("\n", "")
             ascii_ver = ''.join(filter(lambda x: x in string.printable, last_line_eager)).replace("0m", "")
@@ -121,13 +123,13 @@ class realmsClient:
                     print("NT detected, attempting to open README in notepad...")
                     os.system("notepad ..\\README.md")
                     with open(file="../README.md", mode="r") as txt:
-                        read_txt=txt.read()
-                        print(Fore.RED+read_txt)
+                        read_txt = txt.read()
+                        print(Fore.RED + read_txt)
                 elif is_linux:
                     print("Linux Detected, Attempting to open README in nano...")
                     with open(file="../README.md", mode="r") as txt:
-                        read_txt=txt.read()
-                        print(Fore.RED+read_txt)
+                        read_txt = txt.read()
+                        print(Fore.RED + read_txt)
                         print(Fore.LIGHTYELLOW_EX)
 
                     os.system('/bin/bash -c $"nano ..\\README.md"')
@@ -202,9 +204,10 @@ class realmsClient:
             return False
 
     def auto_attack(self, api: dict = None):
-
         """
-        attack
+        automatically attack
+        :param api:
+        :return:
         """
         api_req = None
         if None != api:
@@ -248,7 +251,7 @@ class realmsClient:
             exitNodes += "SOUTH "
 
         for i in apireq["room"]["enemies"]:
-            enemylist += i
+            enemylist += i + " "
 
         for i in apireq["room"]["players"]:
             humanlist += i + " "

@@ -1,8 +1,11 @@
 import setup
+
 if setup.needs_setup() == False:
     setup.setup()
     exit(0)
 import common.get_user_info
+# import curses
+# from curses import wrapper
 from common.telnetClass import realmsClient
 from time import sleep as wait
 from colorama import Fore
@@ -13,7 +16,6 @@ import common.shop_lists
 import os
 
 import re
-
 
 userinfo = common.get_user_info.getUserCond()
 host = userinfo["host"]
@@ -88,7 +90,8 @@ def login_user(username: str = userinfo["username"], password: str = userinfo["p
     newRealClient = realmsClient(password=password, usrname=username, dbglv=debuglevel)
     return newRealClient
 
-def main():
+
+def main(stdscr):
     """
     main function
     :return:
@@ -110,20 +113,20 @@ def main():
             sp_param = userAsk.split(" ")[1]
         print(sp_param)
         len_users = len(userinfo["accounts"])
-        if sp_param=="-d":
+        if sp_param == "-d":
             # If there are more than 1 user, select user.
             print(Fore.GREEN + "Multiple Accounts Detected! Please select an account ")
             for i in userinfo["accounts"]:
                 print(Fore.GREEN + "extra > " + i['username'])
-            print(Fore.GREEN+"default > "+userinfo["username"])
-
+            print(Fore.GREEN + "default > " + userinfo["username"])
 
             while True:
-                user_selected = input(Fore.YELLOW + "Please Select User by username, or if you want the default account, type 'default'\n > ")
+                user_selected = input(
+                    Fore.YELLOW + "Please Select User by username, or if you want the default account, type 'default'\n > ")
                 is_found = False
 
                 if user_selected == "default":
-                    client=login_user()
+                    client = login_user()
                     is_found = True
                     break
                 for i in userinfo["accounts"]:
@@ -191,4 +194,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    #wrapper(main)
+    main(stdscr="NIL")
