@@ -45,6 +45,7 @@ in common/accountdata.json you can find the configuration, here is a example fol
     "host":"https://www.windows93.net",
     "port":8082,
     "debug_level": 0,
+    "aaf_dont_take_money": false,
     "accounts": [
       {
           "username": "us",
@@ -116,3 +117,12 @@ about / ab
 shows about page, with the README
 abort / abr
 abort nr93
+
+### autoattack
+you can start a autoattack based on attack_speed defined in your config json
+it will start attacking & taking money off the ground if found. (unless specified otherwise in configuration file)
+you can start autoatk by sending the alias command 
+
+```
+!aaf
+```

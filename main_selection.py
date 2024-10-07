@@ -191,6 +191,12 @@ def main(stdscr):
 
     elif userAsk == "abort":
         exit(0)
+    # elif userAsk == "bot":
+    #     client = login_user()
+    #     while 1:
+    #         wait(userinfo["attack_speed"])
+    #         client.send_message("a")
+    #
 
 
 if __name__ == "__main__":

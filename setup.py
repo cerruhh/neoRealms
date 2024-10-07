@@ -11,6 +11,7 @@ template_settings = {
         "debug_level": 0,
         "debug_fix": 1,
         "welcome_art": 1,
+        "aaf_dont_take_money": False,
         "accounts": [
             {
                 "username": "extra_account",

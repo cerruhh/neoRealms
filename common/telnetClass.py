@@ -50,7 +50,7 @@ class realmsClient:
 
     def connect(self):
         """
-        connect to realms93
+        connect to realms93 servers and automatically login using given credentials
         :return:
         """
         self.telnetClient.open(host="windows93.net", port=8082)
@@ -276,8 +276,13 @@ class realmsClient:
         """
         extrax = Extras
         isLast = 0
+        accinfo = common.get_user_info.getUserCond()
         while True:
             pass
+            self.send_message("a")
+            wait(accinfo["attack_speed"])
+            if not accinfo["aaf_dont_take_money"]:
+                self.take_all_money()
             # api = client.get_api_dict()
             # curlv=api["level"]
             # xpNeeded=extrax.next_level_exp(lv=curlv) - api["experience"]
