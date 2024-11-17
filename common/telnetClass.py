@@ -2,13 +2,10 @@ import string
 import telnetlib
 import json
 import re
-# import curses
-#from curses import wrapper
 
 from colorama import Fore
 from time import sleep as wait
 import common.get_user_info
-# import storage.art
 import common.shop_lists
 import os
 
@@ -17,7 +14,7 @@ is_linux = os.name == "linux"
 writeapitofile = False
 
 
-def turnFull(cmd: str):
+def TurnFull(cmd: str):
     if cmd == "n":
         # print(Fore.MAGENTA + storage.art.movedn)
         return "north"
@@ -82,17 +79,17 @@ class realmsClient:
                 ascii_ver += "]"
             if eagerlook[0] == "[" or eagerlook[0] == "{":
                 try:
-                    dictver = eval(eagerlook.strip())
+                    eval(eagerlook.strip())
                 except SyntaxError:
                     continue
                 dictver = eval(eagerlook.strip())
-                if dictver == []:
+                if not dictver:
                     continue
 
                 if writeapitofile:
                     with open(file="storage/apistore.json", mode="w", newline=None) as apifile:
                         json.dump(dictver, apifile, indent=3)
-                if type(dictver) == list:
+                if dictver is list:
                     if len(dictver) == 0:
                         continue
                     return dictver[0]
@@ -160,23 +157,24 @@ class realmsClient:
 
     def send_message(self, inputx: str, isrecall: bool = False, api: dict = None):
         """
-        send a command to telnet
+        send a command to telnet.
         :param isrecall:
         :param api:
         :param inputx:
         :return:
         """
-        vapi = None
-        if api is not None:
-            vapi = api
-        else:
-            vapi = self.get_api_dict()
 
         if inputx == "quit":
             self.exited = True
             self.telnetClient.close()
             print(Fore.RED + "Connection Closed to windows93.net:8082")
             exit(0)
+
+        vapi = None
+        if api is not None:
+            vapi = api
+        else:
+            vapi = self.get_api_dict()
 
         if inputx == "l" or inputx == "look":
             self.print_look(apiparam=vapi)
@@ -187,9 +185,9 @@ class realmsClient:
                 print(Fore.MAGENTA + "You cannot bump into walls.")
                 return False
             else:
-                self.telnetClient.write(str.encode(turnFull(cmd=inputx) + "\n"))
+                self.telnetClient.write(str.encode(TurnFull(cmd=inputx) + "\n"))
                 wait(0.2)
-#                self.print_look()
+                #                self.print_look()
                 return True
 
         if "fuck" in inputx:
@@ -242,7 +240,7 @@ class realmsClient:
         enemylist = ""
         humanlist = ""
         itemlist = ""
-        apiparam = None
+        apireq = None
         if apiparam is not None:
             apireq = apiparam
         else:
@@ -287,6 +285,10 @@ class realmsClient:
         while True:
             pass
             self.send_message("a")
+            if accinfo["attack_speed"]<0.1:
+                print("atk speed smaller than ms-latency, setting to 0.1")
+                accinfo["attack_speed"]=0.1
+
             wait(accinfo["attack_speed"])
             print(f"Current Atk Speed: {accinfo['attacks_speed']}")
             if not accinfo["aaf_dont_take_money"]:
@@ -318,6 +320,7 @@ class Extras:
         """
         return round(100 * (pow(1.4, lv) - 1))
 
+    @staticmethod
     def get_all_accs(self):
         userCond = common.get_user_info.getUserCond()
         return userCond["accounts"]

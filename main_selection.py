@@ -191,6 +191,8 @@ def main(stdscr):
                         autocollect = not autocollect
                         print(f"Autocollect set to: {str(autocollect)}")
                         continue
+                    elif cmdx=="col":
+                        client.take_all_money(apiparam=None)
                     elif cmdx=="autocolst":
                         print(f"Autocollect status: {str(autocollect)}")
                         continue
