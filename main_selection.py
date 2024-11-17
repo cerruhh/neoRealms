@@ -138,6 +138,7 @@ def main(stdscr):
                         break
                 if is_found:
                     break
+
         else:
             client = login_user()
 
@@ -153,25 +154,31 @@ def main(stdscr):
         lookproc.start()
 
         #       print(repr(client.telnetClient.read_all()))
+        autocollect = True
         while True:
-            wait(0.2)
             user_command = input("\n")
             if user_command == "":
                 if lastcommand != "":
                     client.send_message(lastcommand.strip())
-                    wait(.2)
                 else:
                     continue
             else:
                 lastcommand = user_command
 
                 if user_command[0] != "!":
+                    # Runas normal command
                     apiSend = client.get_api_dict()
+                    # If the api command worked
                     if apiSend is not None:
-                        client.take_all_money(apiparam=apiSend)
-                        wait(0.126)
                         client.send_message(user_command, api=apiSend, isrecall=False)
+                        # If autocollect is enabled, run this
+                        if autocollect:
+                            # 200ms delay
+                            wait(0.2)
+                            client.take_all_money(apiparam=apiSend)
+                        continue
                 elif user_command[0] == "!":
+                    # Run as alias \!
                     if user_command == "!":
                         for i in userinfo["aliases"]:
                             print(Fore.YELLOW + i.split("|")[0])
@@ -180,8 +187,17 @@ def main(stdscr):
                         infiProcess = Process(target=client.infiniatk())
                         infiProcess.start()
                         continue
+                    elif cmdx == "autocollect":
+                        autocollect = not autocollect
+                        print(f"Autocollect set to: {str(autocollect)}")
+                        continue
+                    elif cmdx=="autocolst":
+                        print(f"Autocollect status: {str(autocollect)}")
+                        continue
                     else:
                         client.run_alias(cmdx)
+
+            wait(0.2)
     elif userAsk == "about":
         print(Fore.RED + storage.art.welcomeart)
         with open(file="README.md", mode="r") as txt:

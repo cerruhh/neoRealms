@@ -69,8 +69,9 @@ class realmsClient:
         :return:
         """
         while 1:
+            print("attempt")
             self.telnetClient.write(str.encode("api\n"))
-            wait(0.05)
+            wait(0.06)
             eagerlook = bytes.decode(self.telnetClient.read_very_eager(), encoding="utf-8")
             # , encoding="utf-8"
             last_line_eager = str.split(eagerlook, "\n")[-1].strip().replace("\n", "")
@@ -160,6 +161,7 @@ class realmsClient:
     def send_message(self, inputx: str, isrecall: bool = False, api: dict = None):
         """
         send a command to telnet
+        :param isrecall:
         :param api:
         :param inputx:
         :return:
@@ -177,7 +179,7 @@ class realmsClient:
             exit(0)
 
         if inputx == "l" or inputx == "look":
-            self.print_look()
+            self.print_look(apiparam=vapi)
             return False
 
         if inputx == "n" or inputx == "w" or inputx == "e" or inputx == "s":
@@ -186,13 +188,14 @@ class realmsClient:
                 return False
             else:
                 self.telnetClient.write(str.encode(turnFull(cmd=inputx) + "\n"))
-                self.print_look()
+                wait(0.2)
+#                self.print_look()
                 return True
 
         if "fuck" in inputx:
             wants_hell = input(
                 Fore.RED + "Are you sure you want to go to hell? (saying fuck will teleport you to hell)? \n (Y/N) > ")
-            if wants_hell == "Y":
+            if wants_hell.lower() == "y":
                 self.telnetClient.write(str.encode(inputx + "\n"))
                 return False
             else:
@@ -229,7 +232,7 @@ class realmsClient:
         # print(bytes.decode(self.telnetClient.read_very_eager()))
         print(bytes.decode(self.telnetClient.read_very_eager()))
 
-    def print_look(self):
+    def print_look(self, apiparam: dict = None):
         """
         getting a look at the place the player currently recides
         :return:
@@ -239,7 +242,11 @@ class realmsClient:
         enemylist = ""
         humanlist = ""
         itemlist = ""
-        apireq = self.get_api_dict()
+        apiparam = None
+        if apiparam is not None:
+            apireq = apiparam
+        else:
+            apireq = self.get_api_dict()
 
         if "n" in apireq["room"]["exits"]:
             exitNodes += "NORTH "
@@ -281,6 +288,7 @@ class realmsClient:
             pass
             self.send_message("a")
             wait(accinfo["attack_speed"])
+            print(f"Current Atk Speed: {accinfo['attacks_speed']}")
             if not accinfo["aaf_dont_take_money"]:
                 self.take_all_money()
             # api = client.get_api_dict()
