@@ -6,11 +6,11 @@ template_settings = {
         "username": "example_username",
         "password": "example_password",
         "attack_speed": 1,
-        "host": "",
+        "host": "windows93.net",
         "port": 8082,
         "debug_level": 0,
-        "debug_fix": 1,
-        "welcome_art": 1,
+        "welcome_art": True,
+        "small_welcome_art": True,
         "aaf_dont_take_money": False,
         "accounts": [
             {
@@ -18,6 +18,7 @@ template_settings = {
                 "password": "secure_password#"
             }
         ],
+        "delay":0.2,
         "aliases": [
             "example|run w1n2",
         ]
@@ -30,7 +31,7 @@ def needs_setup():
 
 
 def setup():
-    if os.path.exists("common/accountdata.json") == False:
+    if not os.path.exists("common/accountdata.json"):
         xfile = open(file="common/accountdata.json", mode="x")
         xfile.close()
 
