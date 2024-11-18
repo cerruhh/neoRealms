@@ -113,7 +113,7 @@ class realmsClient:
             try:
                 # Gets the shop requested, and prints it out.
                 shopval = common.shop_lists.shoplist[str(aliascmd.split(" ")[1].strip())]
-                print(Fore.RESET+shopval)
+                print(Fore.RESET + shopval)
             except KeyError:
                 print("Shop Not Found, type lists for all shop lists.")
             return shopval
@@ -162,6 +162,7 @@ class realmsClient:
             return room_money
         elif room_money == 0 and manual_collect:
             print(Fore.RED + "No money found.")
+
     def send_message(self, inputx: str, isrecall: bool = False, api: dict = None):
         """
         send a command to telnet.

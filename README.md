@@ -54,7 +54,8 @@ in common/accountdata.json you can find the configuration, here is an example fo
     "port":8082,
     "debug_level": 0,
     "aaf_dont_take_money": false,
-    "welcome_art": 1,
+    "welcome_art": true,
+    "small_welcome_art": true,
     "accounts": [
       {
           "username": "example_alt_account_username",
@@ -106,6 +107,7 @@ c -d
 You can find all the ascii art under storage/art.py
 You can customize this screen by changing the string.
 
+Alternatively you can enable "small_welcome_art" to get a smaller welcome art.
 
 ### autocollect autocollect money
 The client will automatically collect money when entering a room.

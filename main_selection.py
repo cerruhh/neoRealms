@@ -22,6 +22,7 @@ host = userinfo["host"]
 port = userinfo["port"]
 
 is_nt = os.name == "nt"
+list_start_commands = ["c", "cli", "a", "abort", "about"]
 
 
 # Is Windows (opens README.md in notepad if so)
@@ -96,26 +97,29 @@ def main():
     main function
     :return:
     """
-    print(Fore.YELLOW + storage.art.welcomeart)
-    if userinfo["debug_level"]>0:
-        print(Fore.RESET+"Warning! User running neorealms with debug level enabled!")
+
+    global client
+    if userinfo["welcome_art"]:
+        if userinfo["small_welcome_art"]:
+            print(Fore.YELLOW + storage.art.smallwelcomeart)
+        else:
+            print(Fore.YELLOW + storage.art.welcomeart)
+    if userinfo["debug_level"] > 0:
+        print(Fore.RESET + "Warning! User running neorealms with debug level enabled!")
 
     while True:
         userAsk = input(Fore.RESET + "what do you want to do? (cli (-d for select account),abort, about)?\n > ").lower()
         userSplit = userAsk.split(" ")[0]
-        if userSplit == "gui" or userSplit == "g" or userSplit == "c" or userSplit == "cli" or userSplit == "a" or userSplit == 'abort' or userSplit == "about":
+        if userSplit in list_start_commands:
             break
-    client = None
-    selected_user = ""
 
     if userSplit == "cli" or userSplit == "c":
-
         sp_param_len = len(userAsk.split(" ")) == 2
         sp_param = ""
         if sp_param_len:
             sp_param = userAsk.split(" ")[1]
         print(sp_param)
-#       len_users = len(userinfo["accounts"])
+        #       len_users = len(userinfo["accounts"])
         if sp_param == "-d":
             # If there are more than 1 user, select user.
             print(Fore.GREEN + "Multiple Accounts Detected! Please select an account ")
@@ -126,22 +130,18 @@ def main():
             while True:
                 user_selected = input(
                     Fore.YELLOW + "Please Select User by username, or if you want the default account, type 'default'\n > ")
-                is_found = False
-
+                isfound=False
                 if user_selected == "default":
                     client = login_user()
-                    is_found = True
                     break
                 for i in userinfo["accounts"]:
                     if str(i["username"]) == user_selected:
                         print(i["username"])
                         client = login_user(username=i["username"], password=i["password"])
-                        is_found = True
-                        selected_user = i["username"]
+                        isfound = True
                         break
-                if is_found:
+                if isfound:
                     break
-
         else:
             client = login_user()
 
@@ -164,7 +164,7 @@ def main():
             if user_command == "":
                 if lastcommand != "":
                     client.send_message(lastcommand.strip())
-                    print(Fore.RESET+f"Sent command: {lastcommand.strip()}")
+                    print(Fore.RESET + f"Sent command: {lastcommand.strip()}")
                     wait(userinfo["delay"])
                 else:
                     continue
@@ -197,7 +197,7 @@ def main():
                         autocollect = not autocollect
                         print(f"Autocollect set to: {str(autocollect)}")
                         continue
-                    elif cmdx=="autocolst":
+                    elif cmdx == "autocolst":
                         print(f"Autocollect status: {str(autocollect)}")
                         continue
                     else:
@@ -205,10 +205,13 @@ def main():
 
             wait(userinfo["delay"])
     elif userAsk == "about":
-        print(Fore.RED + storage.art.welcomeart)
-        with open(file="README.md", mode="r") as txt:
-            print(Fore.MAGENTA + txt.read())
+        if userinfo["small_welcome_art"]:
+            print(Fore.RED + storage.art.smallwelcomeart)
+        else:
+            print(Fore.RED + storage.art.welcomeart)
 
+        print(Fore.RESET+"Neo Realms is a project by cerruhh. Neorealms aims to make playing realms93 more modular, and giving the player nessecary abilites, and quality of life improvements.")
+        print("Neorealms is licensed under the GPL v3.0 license. You can find the license under the LICENSE file.")
         exit(2015)
 
     elif userAsk == "abort":
@@ -222,5 +225,4 @@ def main():
 
 
 if __name__ == "__main__":
-    #wrapper(main)
     main()
