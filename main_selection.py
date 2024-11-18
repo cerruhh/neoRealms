@@ -1,6 +1,6 @@
 import setup
 
-if setup.needs_setup() == False:
+if not setup.needs_setup():
     setup.setup()
     exit(0)
 import common.get_user_info
@@ -91,12 +91,15 @@ def login_user(username: str = userinfo["username"], password: str = userinfo["p
     return newRealClient
 
 
-def main(stdscr):
+def main():
     """
     main function
     :return:
     """
     print(Fore.YELLOW + storage.art.welcomeart)
+    if userinfo["debug_level"]>0:
+        print(Fore.RESET+"Warning! User running neorealms with debug level enabled!")
+
     while True:
         userAsk = input(Fore.RESET + "what do you want to do? (cli (-d for select account),abort, about)?\n > ").lower()
         userSplit = userAsk.split(" ")[0]
@@ -112,7 +115,7 @@ def main(stdscr):
         if sp_param_len:
             sp_param = userAsk.split(" ")[1]
         print(sp_param)
-        len_users = len(userinfo["accounts"])
+#       len_users = len(userinfo["accounts"])
         if sp_param == "-d":
             # If there are more than 1 user, select user.
             print(Fore.GREEN + "Multiple Accounts Detected! Please select an account ")
@@ -143,7 +146,7 @@ def main(stdscr):
             client = login_user()
 
         client.connect()
-        wait(0.2)
+        wait(userinfo["delay"])
         lastcommand = ""
 
         # atk_process = Thread(target=client.auto_attack)
@@ -156,10 +159,13 @@ def main(stdscr):
         #       print(repr(client.telnetClient.read_all()))
         autocollect = True
         while True:
-            user_command = input("\n")
+            # Main Loop
+            user_command = input(Fore.RESET + "\n")
             if user_command == "":
                 if lastcommand != "":
                     client.send_message(lastcommand.strip())
+                    print(Fore.RESET+f"Sent command: {lastcommand.strip()}")
+                    wait(userinfo["delay"])
                 else:
                     continue
             else:
@@ -174,7 +180,7 @@ def main(stdscr):
                         # If autocollect is enabled, run this
                         if autocollect:
                             # 200ms delay
-                            wait(0.2)
+                            wait(userinfo["delay"])
                             client.take_all_money(apiparam=apiSend)
                         continue
                 elif user_command[0] == "!":
@@ -191,15 +197,13 @@ def main(stdscr):
                         autocollect = not autocollect
                         print(f"Autocollect set to: {str(autocollect)}")
                         continue
-                    elif cmdx=="col":
-                        client.take_all_money(apiparam=None)
                     elif cmdx=="autocolst":
                         print(f"Autocollect status: {str(autocollect)}")
                         continue
                     else:
                         client.run_alias(cmdx)
 
-            wait(0.2)
+            wait(userinfo["delay"])
     elif userAsk == "about":
         print(Fore.RED + storage.art.welcomeart)
         with open(file="README.md", mode="r") as txt:
@@ -219,4 +223,4 @@ def main(stdscr):
 
 if __name__ == "__main__":
     #wrapper(main)
-    main(stdscr="NIL")
+    main()

@@ -5,7 +5,7 @@ import re
 
 from colorama import Fore
 from time import sleep as wait
-import common.get_user_info
+from common.get_user_info import getUserCond
 import common.shop_lists
 import os
 
@@ -41,8 +41,7 @@ class realmsClient:
         self.password = password
         self.username = usrname
         self.exited = False
-        if dbglv != 0:
-            self.telnetClient.set_debuglevel(dbglv)
+        self.telnetClient.set_debuglevel(dbglv)
         self.current_room = ""
 
     def connect(self):
@@ -65,10 +64,12 @@ class realmsClient:
         get the api dictionary provided by Realms93.
         :return:
         """
-        while 1:
+        settings = getUserCond()
+        if settings["debug_level"] > 0:
             print("attempt")
+        while 1:
             self.telnetClient.write(str.encode("api\n"))
-            wait(0.06)
+            wait(settings["delay"])
             eagerlook = bytes.decode(self.telnetClient.read_very_eager(), encoding="utf-8")
             # , encoding="utf-8"
             last_line_eager = str.split(eagerlook, "\n")[-1].strip().replace("\n", "")
@@ -104,40 +105,43 @@ class realmsClient:
         :param aliascmd:
         :return:
         """
-        accinfo = common.get_user_info.getUserCond()
+        accinfo = getUserCond()
+        if aliascmd == "lists":
+            print(common.shop_lists.list_all)
+        elif aliascmd.split(" ")[0] == "list" and len(aliascmd.split(" ")) == 2:
+            shopval = None
+            try:
+                # Gets the shop requested, and prints it out.
+                shopval = common.shop_lists.shoplist[str(aliascmd.split(" ")[1].strip())]
+                print(Fore.RESET+shopval)
+            except KeyError:
+                print("Shop Not Found, type lists for all shop lists.")
+            return shopval
+        elif aliascmd == "man":
+            if is_nt:
+                print("NT detected, attempting to open README in notepad...")
+                os.system("notepad ..\\README.md")
+                with open(file="../README.md", mode="r") as txt:
+                    read_txt = txt.read()
+                    print(Fore.RED + read_txt)
+            elif is_linux:
+                print("Linux Detected, Attempting to open README in nano...")
+                with open(file="../README.md", mode="r") as txt:
+                    read_txt = txt.read()
+                    print(Fore.RED + read_txt)
+                    print(Fore.LIGHTYELLOW_EX)
+
+                os.system('/bin/bash -c $"vi ..\\README.md"')
+        elif aliascmd == "col":
+            self.take_all_money(apiparam=None, manual_collect=True)
         if len(accinfo["aliases"]) != 0:
-            if aliascmd == "lists":
-                print(common.shop_lists.list_all)
-            if aliascmd.split(" ")[0] == "list" and len(aliascmd.split(" ")) == 2:
-                shopval = None
-                try:
-                    shopval = common.shop_lists.shoplist[str(aliascmd.split(" ")[1].strip())]
-                except KeyError:
-                    print("Shop Not Found, type lists for all shop lists.")
-                print("ShopVal")
-                return shopval
-            if aliascmd == "man":
-                if is_nt:
-                    print("NT detected, attempting to open README in notepad...")
-                    os.system("notepad ..\\README.md")
-                    with open(file="../README.md", mode="r") as txt:
-                        read_txt = txt.read()
-                        print(Fore.RED + read_txt)
-                elif is_linux:
-                    print("Linux Detected, Attempting to open README in nano...")
-                    with open(file="../README.md", mode="r") as txt:
-                        read_txt = txt.read()
-                        print(Fore.RED + read_txt)
-                        print(Fore.LIGHTYELLOW_EX)
-
-                    os.system('/bin/bash -c $"nano ..\\README.md"')
-
+            # Does not run if no aliases are defined.
             for cmd in accinfo["aliases"]:
                 split = str.split(cmd, "|")
                 if split[0] == aliascmd:
                     self.send_message(split[1])
 
-    def take_all_money(self, apiparam: dict = None):
+    def take_all_money(self, apiparam: dict = None, manual_collect: bool = False):
 
         """
         take all money from ground
@@ -151,10 +155,13 @@ class realmsClient:
             api = self.get_api_dict()
         room_money = api["room"]["money"]
         if room_money != 0:
-            self.telnetClient.write(str.encode("take $" + str(room_money)))
+            strmoney = str(room_money)
+            self.telnetClient.write(str.encode(f"take ${strmoney}"))
+            print(Fore.YELLOW + f"Collected: {strmoney}")
             newapi = self.get_api_dict()
             return room_money
-
+        elif room_money == 0 and manual_collect:
+            print(Fore.RED + "No money found.")
     def send_message(self, inputx: str, isrecall: bool = False, api: dict = None):
         """
         send a command to telnet.
@@ -285,9 +292,9 @@ class realmsClient:
         while True:
             pass
             self.send_message("a")
-            if accinfo["attack_speed"]<0.1:
+            if accinfo["attack_speed"] < 0.1:
                 print("atk speed smaller than ms-latency, setting to 0.1")
-                accinfo["attack_speed"]=0.1
+                accinfo["attack_speed"] = 0.1
 
             wait(accinfo["attack_speed"])
             print(f"Current Atk Speed: {accinfo['attacks_speed']}")
