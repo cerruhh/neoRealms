@@ -1,5 +1,6 @@
 #project-related
 common/accountdata.json
+storage/art.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
