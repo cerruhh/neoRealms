@@ -171,11 +171,11 @@ class realmsClient:
         :param inputx:
         :return:
         """
-
+        settings=getUserCond()
         if inputx == "quit":
             self.exited = True
             self.telnetClient.close()
-            print(Fore.RED + "Connection Closed to windows93.net:8082")
+            print(Fore.RED + f"Connection Closed to {settings['host']}:{settings['port']}")
             exit(0)
 
         vapi = None
