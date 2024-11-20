@@ -16,16 +16,12 @@ writeapitofile = False
 
 def TurnFull(cmd: str):
     if cmd == "n":
-        # print(Fore.MAGENTA + storage.art.movedn)
         return "north"
     elif cmd == "s":
-        # print(Fore.MAGENTA + storage.art.moveds)
         return "south"
     elif cmd == "e":
-        # print(Fore.MAGENTA + storage.art.movede)
         return "east"
     elif cmd == "w":
-        # print(Fore.MAGENTA + storage.art.movedw)
         return "west"
 
 
@@ -171,7 +167,7 @@ class realmsClient:
         :param inputx:
         :return:
         """
-        settings=getUserCond()
+        settings = getUserCond()
         if inputx == "quit":
             self.exited = True
             self.telnetClient.close()
@@ -313,6 +309,15 @@ class realmsClient:
             #     print(Fore.LIGHTRED_EX+f"You need {xpNeeded} to get to the next level!")
             #     isLast=xpNeeded
             # wait(0.2)
+
+    def create_data_json(self, api: dict = None):
+        if api is None:
+            api = self.get_api_dict()
+
+        with open(file="storage/datafile.json", mode="w+") as datafile:
+            datafiledump = json.load(datafile)
+            if "accounts" in datafiledump:
+                pass
 
 
 class Extras:

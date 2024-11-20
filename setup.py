@@ -18,16 +18,25 @@ template_settings = {
                 "password": "secure_password#"
             }
         ],
-        "delay":0.2,
+        "delay": 0.2,
         "aliases": [
             "example|run w1n2",
         ]
     }
 }
 
+template_data = {
+    "accounts": []
+}
+
 
 def needs_setup():
     return os.path.exists("common/accountdata.json")
+
+
+def create_data_file():
+    with open("storage/datafile.json", mode="w") as dfile:
+        json.dump(template_data, dfile, indent=1)
 
 
 def setup():
@@ -38,3 +47,5 @@ def setup():
         with open("common/accountdata.json", mode="w") as file:
             json.dump(template_settings, file, indent=3)
             print("Settings File Created! Located at /common/accountdata.json")
+
+        create_data_file()

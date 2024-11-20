@@ -60,14 +60,14 @@ def remove_api(stringx: str):
     """
     newstring = ""
     for i in stringx.splitlines():
-        if i != "" and i[0] != "{":
+        if i != "" and i[0] != '{"name":':
             newstring += i + "\n"
 
     return newstring
 
 
 def proc_read(cl):
-    wait(1)
+    wait(.2)
     oread = remove_api(print_filter(bytes.decode(cl.telnetClient.read_very_eager(), encoding="utf-8")))
     while True:
         if cl.exited:
@@ -158,6 +158,7 @@ def main():
 
         #       print(repr(client.telnetClient.read_all()))
         autocollect = True
+        wait(0.3)
         while True:
             # Main Loop
             user_command = input(Fore.RESET + "\n")
