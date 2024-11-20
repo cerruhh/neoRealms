@@ -77,7 +77,7 @@ def proc_read(cl):
         if read_convert != oread and (read_convert != "" or read_convert != "\n"):
             print_status(read_convert.strip())
             oread = read_convert
-        wait(0.5)
+        wait(0.2)
 
 
 def login_user(username: str = userinfo["username"], password: str = userinfo["password"]):
